@@ -14,11 +14,17 @@ type (
 		PostgreURL postgreURL `yaml:"postgres"`
 		AppInfo    appStruct  `yaml:"app"`
 		HttpInfo   httpStruct `yaml:"http"`
+		GrpcInfo   grpcStruct `yaml:"grpc"`
 	}
 
 	appStruct struct {
 		Name    string `yaml:"name" env-required:"true"`
 		Version string `yaml:"version" env-required:"true"`
+	}
+
+	grpcStruct struct {
+		Address string        `yaml:"address" env-default:"50051"`
+		Timeout time.Duration `yaml:"timeout" env-default:"1s"`
 	}
 
 	httpStruct struct {
