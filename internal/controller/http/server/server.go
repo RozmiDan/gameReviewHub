@@ -7,28 +7,30 @@ import (
 	"github.com/RozmiDan/gameReviewHub/internal/config"
 	"github.com/RozmiDan/gameReviewHub/internal/entity"
 
-	addcomment "github.com/RozmiDan/gameReviewHub/internal/http/handlers/addcomment"
-	gametopic "github.com/RozmiDan/gameReviewHub/internal/http/handlers/gametopic"
-	listcomments "github.com/RozmiDan/gameReviewHub/internal/http/handlers/listcomments"
-	mainpage "github.com/RozmiDan/gameReviewHub/internal/http/handlers/mainpage"
-	postrating "github.com/RozmiDan/gameReviewHub/internal/http/handlers/postrating"
-	middleware_main "github.com/RozmiDan/gameReviewHub/internal/http/middleware/logger"
+	addcomment "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/addcomment"
+	gametopic "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/gametopic"
+	listcomments "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/listcomments"
+	mainpage "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/mainpage"
+	postrating "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/postrating"
+	middleware_main "github.com/RozmiDan/gameReviewHub/internal/controller/http/middleware/logger"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"go.uber.org/zap"
 )
 
 type GameUseCase interface {
-	GetListGames(ctx context.Context, limit, offset int) ([]entity.GameRating, error)
-	GetTopicGame(ctx context.Context, limit, offset int) (entity.Game, error)
+	GetListGames(ctx context.Context, limit, offset int32) ([]entity.GameInList, error)
+	GetTopicGame(ctx context.Context, gameID string) (entity.Game, error)
 
-	PostRating(ctx context.Context, gameId string) (bool, error)
+	PostRating(ctx context.Context, gameID, userID string, rating int32) (bool, error)
 
-	GetListComments(ctx context.Context, limit, offset int) ([]entity.Comment, error)
+	GetListComments(ctx context.Context, gameID string, limit, offset int) ([]entity.Comment, error)
 	AddComment(ctx context.Context, gameID, userID, text string) error
 }
 
 func InitServer(cnfg *config.Config, logger *zap.Logger, uc GameUseCase) *http.Server {
+	logger = logger.With(zap.String("layer", "mainController"))
+
 	router := chi.NewRouter()
 
 	router.Use(middleware.RequestID)

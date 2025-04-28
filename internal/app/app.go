@@ -10,7 +10,8 @@ import (
 
 	"github.com/RozmiDan/gameReviewHub/db"
 	"github.com/RozmiDan/gameReviewHub/internal/config"
-	rating "github.com/RozmiDan/gameReviewHub/internal/repo/grpcclient"
+	httpserver "github.com/RozmiDan/gameReviewHub/internal/controller/http/server"
+	"github.com/RozmiDan/gameReviewHub/internal/usecase"
 
 	"github.com/RozmiDan/gameReviewHub/pkg/logger"
 	"github.com/RozmiDan/gameReviewHub/pkg/postgres"
@@ -37,38 +38,36 @@ func Run(cfg *config.Config) {
 
 	// grpc
 
-	ratingService, err := rating.New(context.TODO(), logger,
-		cfg.GrpcInfo.Address, cfg.GrpcInfo.Timeout)
+	// ratingService, err := rating.New(context.TODO(), logger,
+	// 	cfg.GrpcInfo.Address, cfg.GrpcInfo.Timeout)
 
-	if err != nil {
-		os.Exit(1)
-	}
-	logger.Info("\n\n\n")
+	// if err != nil {
+	// 	os.Exit(1)
+	// }
+	// logger.Info("\n\n\n")
 
-	go func() {
-		res, _ := ratingService.GetGameRating(context.TODO(), "623ee63e-b4cc-4d3b-bd6c-f5c33411fa62")
-		logger.Info("result", zap.Any("rate", res.AverageRating),
-			zap.Any("id", res.GameID),
-			zap.Any("count", res.RatingsCount),
-		)
-	}()
+	// go func() {
+	// 	res, _ := ratingService.GetGameRating(context.TODO(), "623ee63e-b4cc-4d3b-bd6c-f5c33411fa62")
+	// 	logger.Info("result", zap.Any("rate", res.AverageRating),
+	// 		zap.Any("id", res.GameID),
+	// 		zap.Any("count", res.RatingsCount),
+	// 	)
+	// }()
 
-	resGames, _ := ratingService.GetTopGames(context.TODO(), 10, 0)
+	// resGames, _ := ratingService.GetTopGames(context.TODO(), 10, 0)
 
-	for _, it := range resGames {
-		logger.Info("result", zap.Any("rate", it.AverageRating),
-			zap.Any("id", it.GameID),
-			zap.Any("count", it.RatingsCount),
-		)
-	}
+	// for _, it := range resGames {
+	// 	logger.Info("result", zap.Any("rate", it.AverageRating),
+	// 		zap.Any("id", it.GameID),
+	// 		zap.Any("count", it.RatingsCount),
+	// 	)
+	// }
 
-	logger.Info("\n\n\n")
+	// usecase
+	uc := usecase.NewUsecase()
+
 	// server
-	//server := httpserver.InitServer(cfg, logger, pg)
-
-	server := http.Server{
-		Addr: cfg.HttpInfo.Port,
-	}
+	server := httpserver.InitServer(cfg, logger, uc)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

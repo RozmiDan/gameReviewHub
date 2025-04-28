@@ -5,8 +5,16 @@ import "time"
 type Game struct {
 	ID          string     `json:"id"`
 	Name        string     `json:"name"`
+	Genre       string     `json:"genre"`
+	Creator     string     `json:"creator"`
 	Description string     `json:"description"`
 	Rating      GameRating `json:"rating"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ReleaseDate time.Time  `json:"releasedate"`
+}
+
+type GameInList struct {
+	ID     string  `json:"id"`
+	Name   string  `json:"name"`
+	Genre  string  `json:"genre"`
+	Rating float64 `json:"rating"`
 }

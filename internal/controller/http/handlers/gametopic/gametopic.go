@@ -12,7 +12,7 @@ import (
 // GET   /games/{game_id}
 
 type TopicGameGetter interface {
-	GetTopicGame(ctx context.Context, limit, offset int) (entity.Game, error)
+	GetTopicGame(ctx context.Context, gameID string) (entity.Game, error)
 }
 
 type Response struct {

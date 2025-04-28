@@ -12,7 +12,7 @@ import (
 // GET  /games/{game_id}/comments?limit=&offset=
 
 type ListCommentsGetter interface {
-	GetListComments(ctx context.Context, limit, offset int) ([]entity.Comment, error)
+	GetListComments(ctx context.Context, gameID string, limit, offset int) ([]entity.Comment, error)
 }
 
 type Response struct {

@@ -4,13 +4,14 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/RozmiDan/gameReviewHub/internal/entity"
 	"github.com/go-chi/chi/middleware"
 	"go.uber.org/zap"
 )
 
-type GamesListGetter interface {
-	GetListGames(ctx context.Context, limit, offset int) ([]entity.GameRating, error)
+// POST  /games/{game_id}/rating
+
+type RatingPoster interface {
+	PostRating(ctx context.Context, gameID, userID string, rating int32) (bool, error)
 }
 
 type Response struct {
@@ -18,9 +19,9 @@ type Response struct {
 	Status string `json:"status"`
 }
 
-func NewMainpageHandler(logger *zap.Logger, uc GamesListGetter) http.HandlerFunc {
+func NewRatingPostHandler(logger *zap.Logger, uc RatingPoster) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logger = logger.With(zap.String("func", "MainpageHandler"),
+		logger = logger.With(zap.String("func", "RatingPostHandler"),
 			zap.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
