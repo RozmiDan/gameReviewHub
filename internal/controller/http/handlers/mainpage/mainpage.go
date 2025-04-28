@@ -19,13 +19,11 @@ type GamesListGetter interface {
 	GetListGames(ctx context.Context, limit, offset int32) ([]entity.GameInList, error)
 }
 
-type RequestIDKey struct{}
-
 func NewMainpageHandler(logger *zap.Logger, uc GamesListGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		reqID := middleware.GetReqID(r.Context())
 
-		ctx := context.WithValue(r.Context(), RequestIDKey{}, reqID)
+		ctx := context.WithValue(r.Context(), entity.RequestIDKey{}, reqID)
 		ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 		defer cancel()
 

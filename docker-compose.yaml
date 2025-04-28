@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: 'highload_postgres'
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_HOST:      "${POSTGRES_HOST}"
+      POSTGRES_DB:        "${POSTGRES_DB}"
+      POSTGRES_USER:      "${POSTGRES_USER}"
+      POSTGRES_PASSWORD:  "${POSTGRES_PASSWORD}"
+      POSTGRES_PORT:      "${POSTGRES_PORT}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - internal
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: 'highload_prometheus'
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - internal
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: 'highload_grafana'
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+    depends_on:
+      - prometheus
+
+#   app:
+#     build: .
+#     container_name: url_shortener_app
+#     restart: always 
+#     depends_on:
+#       - postgres
+#     environment:
+#       CONFIG_PATH: "/app/config.prod.yaml"
+#     ports:
+#       - "8080:8080"
+#     volumes:
+#       - ./config/config.prod.yaml:/app/config.prod.yaml
+#     working_dir: /app
+#     command: ["/app/url_shortener"]
+#     networks:
+#       - internal
+#     healthcheck:
+#       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+#       interval: 5s
+#       timeout: 3s
+#       retries: 5
+
+# volumes:
+#   postgres_data:
+
+# networks:
+#   internal:
+#     driver: bridge

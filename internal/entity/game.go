@@ -18,3 +18,5 @@ type GameInList struct {
 	Genre  string  `json:"genre"`
 	Rating float64 `json:"rating"`
 }
+
+type RequestIDKey struct{}

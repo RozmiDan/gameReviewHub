@@ -11,6 +11,8 @@ import (
 	"github.com/RozmiDan/gameReviewHub/db"
 	"github.com/RozmiDan/gameReviewHub/internal/config"
 	httpserver "github.com/RozmiDan/gameReviewHub/internal/controller/http/server"
+	rating "github.com/RozmiDan/gameReviewHub/internal/repo/grpcclient"
+	postgres_storage "github.com/RozmiDan/gameReviewHub/internal/repo/postgre"
 	"github.com/RozmiDan/gameReviewHub/internal/usecase"
 
 	"github.com/RozmiDan/gameReviewHub/pkg/logger"
@@ -28,43 +30,46 @@ func Run(cfg *config.Config) {
 	db.SetupPostgres(cfg, logger)
 	logger.Info("Migrations completed successfully\n")
 
+	// repo
 	pg, err := postgres.New(cfg.PostgreURL.URL, postgres.MaxPoolSize(4))
 	if err != nil {
 		logger.Error("Cant open database", zap.Error(err))
 		os.Exit(1)
 	}
-
 	defer pg.Close()
 
+	repo := postgres_storage.New(pg, logger)
+
 	// grpc
-
-	// ratingService, err := rating.New(context.TODO(), logger,
-	// 	cfg.GrpcInfo.Address, cfg.GrpcInfo.Timeout)
-
-	// if err != nil {
-	// 	os.Exit(1)
-	// }
-	// logger.Info("\n\n\n")
-
-	// go func() {
-	// 	res, _ := ratingService.GetGameRating(context.TODO(), "623ee63e-b4cc-4d3b-bd6c-f5c33411fa62")
-	// 	logger.Info("result", zap.Any("rate", res.AverageRating),
-	// 		zap.Any("id", res.GameID),
-	// 		zap.Any("count", res.RatingsCount),
-	// 	)
-	// }()
-
-	// resGames, _ := ratingService.GetTopGames(context.TODO(), 10, 0)
-
-	// for _, it := range resGames {
-	// 	logger.Info("result", zap.Any("rate", it.AverageRating),
-	// 		zap.Any("id", it.GameID),
-	// 		zap.Any("count", it.RatingsCount),
-	// 	)
-	// }
+	ratingService, err := rating.New(context.TODO(), logger, cfg.GrpcInfo.Address, cfg.GrpcInfo.Timeout)
+	if err != nil {
+		os.Exit(1)
+	}
 
 	// usecase
-	uc := usecase.NewUsecase()
+	uc := usecase.New(ratingService, repo, logger)
+
+	ids := []string{"f683e3de-ef27-470e-b909-9e5f30d9c174",
+		"16bb8cf0-c346-4681-a2f1-5b90d96120b5",
+		// "437c3a12-3008-4f5a-848e-352b6f1386da",
+		// "b1356b34-cd5f-4358-b4e0-94bbf5527321",
+		// "3e3bea4b-b58d-46e0-8424-af0ed96a069b",
+		// "cae23ce0-4664-450a-9935-41052e603f44",
+		// "6d796c7d-c6a9-4806-8712-a8c74c61c7cd",
+		// "0905184c-0445-44b9-8a75-9cffab9a85b9",
+		// "8a72872d-f514-4b28-8a90-ea554ca90616",
+		// "920ffc7b-91c5-4480-afb4-1a22a6ce7373",
+	}
+
+	list, err := repo.GetGameInfo(context.TODO(), ids)
+	if err != nil {
+		logger.Error("errooooooor", zap.Error(err))
+	}
+	for _, it := range list {
+		logger.Info("response", zap.String("g", it.Genre), zap.String("id", it.ID),
+			zap.String("n", it.Name), zap.Float64("r", it.Rating),
+		)
+	}
 
 	// server
 	server := httpserver.InitServer(cfg, logger, uc)
@@ -95,24 +100,3 @@ func Run(cfg *config.Config) {
 
 	logger.Info("Finishing programm")
 }
-
-// var userID int
-// logger.Info("Connected postgres\n")
-// query, args, err := pg.Builder.Insert("users").
-// 	Columns("nickname", "mail").
-// 	Values("savvy", "hfs@mail.com").
-// 	Suffix("RETURNING id").
-// 	ToSql()
-
-// if err != nil {
-// 	logger.Error("ошибка при создании запроса:",
-// 		zap.Error(err))
-// }
-
-// err = pg.Pool.QueryRow(context.Background(), query, args...).Scan(&userID)
-
-// if err != nil {
-// 	logger.Info("result of db", zap.Error(err))
-// }
-
-// logger.Info("result of db", zap.Int("id", userID))

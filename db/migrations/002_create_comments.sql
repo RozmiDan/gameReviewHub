@@ -1,5 +1,4 @@
 -- +goose Up
-
 CREATE TABLE IF NOT EXISTS comments (
   id         UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
   game_id    UUID        NOT NULL REFERENCES games(id) ON DELETE CASCADE,
