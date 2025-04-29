@@ -25,9 +25,17 @@ func (r *RatingRepository) GetGameTopic(ctx context.Context, ids string) (*entit
 }
 
 func (r *RatingRepository) GetGameInfo(ctx context.Context, ids []string) ([]entity.GameInList, error) {
-	logger := r.logger.With(zap.String("func", "GetGameInfo"), zap.Int("count", len(ids)))
+
+	reqID, _ := ctx.Value(entity.RequestIDKey{}).(string)
+	logger := r.logger
+	if reqID != "" {
+		logger = logger.With(zap.String("request_id", reqID))
+	}
+	logger = logger.With(zap.String("func", "GetGameInfo"))
+
 	if len(ids) == 0 {
-		return nil, nil
+		logger.Debug("no ids provided, returning empty list")
+		return []entity.GameInList{}, nil
 	}
 
 	placeholders := make([]string, len(ids))
@@ -60,7 +68,10 @@ func (r *RatingRepository) GetGameInfo(ctx context.Context, ids []string) ([]ent
 		out = append(out, g)
 	}
 
-	logger.Info("games successfuly found", zap.Int("count", len(out)))
+	logger.Info("fetched game metadata",
+		zap.Int("requested_ids", len(ids)),
+		zap.Int("found_records", len(out)),
+	)
 
 	return out, nil
 }
