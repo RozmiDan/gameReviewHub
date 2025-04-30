@@ -24,7 +24,7 @@ type GameUseCase interface {
 
 	PostRating(ctx context.Context, gameID, userID string, rating int32) (bool, error)
 
-	GetListComments(ctx context.Context, gameID string, limit, offset int) ([]entity.Comment, error)
+	GetListComments(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
 	AddComment(ctx context.Context, gameID, userID, text string) error
 }
 

@@ -2,17 +2,9 @@ package handlers
 
 import "github.com/RozmiDan/gameReviewHub/internal/entity"
 
-type Pagination struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-	Count  int   `json:"count,omitempty"`
-	Total  int   `json:"total,omitempty"`
-}
-
 // ListGamesResponse — обёртка для GET /games
-type ListGamesResponse struct {
-	Data []entity.GameInList `json:"data"`
-	Meta *Pagination         `json:"meta,omitempty"`
+type GameTopicResponse struct {
+	Data entity.Game `json:"data"`
 }
 
 // --------------- ответы с ошибкой ---------------

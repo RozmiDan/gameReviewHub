@@ -6,6 +6,6 @@ import (
 	"github.com/RozmiDan/gameReviewHub/internal/entity"
 )
 
-func (u *Usecase) GetListComments(ctx context.Context, gameID string, limit, offset int) ([]entity.Comment, error) {
+func (u *Usecase) GetListComments(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error) {
 	return []entity.Comment{}, nil
 }

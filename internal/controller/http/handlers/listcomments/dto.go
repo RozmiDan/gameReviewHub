@@ -10,9 +10,9 @@ type Pagination struct {
 }
 
 // ListGamesResponse — обёртка для GET /games
-type ListGamesResponse struct {
-	Data []entity.GameInList `json:"data"`
-	Meta *Pagination         `json:"meta,omitempty"`
+type ListCommentsResponse struct {
+	Data []entity.Comment `json:"data"`
+	Meta *Pagination      `json:"meta,omitempty"`
 }
 
 // --------------- ответы с ошибкой ---------------
