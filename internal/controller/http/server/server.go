@@ -20,7 +20,7 @@ import (
 
 type GameUseCase interface {
 	GetListGames(ctx context.Context, limit, offset int32) ([]entity.GameInList, error)
-	GetTopicGame(ctx context.Context, gameID string) (entity.Game, error)
+	GetTopicGame(ctx context.Context, gameID string) (*entity.Game, error)
 
 	PostRating(ctx context.Context, gameID, userID string, rating int32) (bool, error)
 

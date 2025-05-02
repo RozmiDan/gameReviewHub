@@ -17,7 +17,7 @@ import (
 // GET   /games/{game_id}
 
 type TopicGameGetter interface {
-	GetTopicGame(ctx context.Context, gameID string) (entity.Game, error)
+	GetTopicGame(ctx context.Context, gameID string) (*entity.Game, error)
 }
 
 func NewGameTopicHandler(baseLogger *zap.Logger, uc TopicGameGetter) http.HandlerFunc {
@@ -72,6 +72,6 @@ func NewGameTopicHandler(baseLogger *zap.Logger, uc TopicGameGetter) http.Handle
 
 		// 5) форматируем ответ
 		render.Status(r, http.StatusOK)
-		render.JSON(w, r, GameTopicResponse{Data: game})
+		render.JSON(w, r, GameTopicResponse{Data: *game})
 	}
 }

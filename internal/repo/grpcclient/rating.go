@@ -72,11 +72,29 @@ func (c *Client) GetGameRating(ctx context.Context, gameID string) (*entity.Game
 	})
 
 	if err != nil {
-		if st, ok := status.FromError(err); ok && st.Code() == codes.NotFound {
-			return nil, entity.ErrGameNotFound
-		}
-		return &entity.GameRating{}, err
-	}
+        // если это gRPC-ошибка, разбираем код
+        if st, ok := status.FromError(err); ok {
+            switch st.Code() {
+            case codes.NotFound:
+                // просто нет оценок у игры
+                return nil, entity.ErrGameNotFound
+
+            case codes.InvalidArgument:
+                // пришёл некорректный UUID
+                return nil, entity.ErrInvalidUUID
+
+            case codes.Unavailable, codes.DeadlineExceeded:
+                // сервис упал или вышли таймауты
+                return nil, entity.ErrServiceUnavailable
+
+            default:
+                // всё остальное — внутренняя ошибка
+                return nil, entity.ErrInternalRating
+            }
+        }
+        // не-gRPC-ошибка (например, сеть)
+        return nil, err
+    }
 
 	respGame := &entity.GameRating{
 		GameID:        resp.GetGameId(),

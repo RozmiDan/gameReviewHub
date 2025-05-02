@@ -20,9 +20,9 @@ type RatingClient interface {
 }
 
 type GameRepository interface {
-    GetGameTopic(ctx context.Context, ids string) (*entity.Game, error)
+    GetGameTopic(ctx context.Context, gameID string) (*entity.Game, error)
     GetGameInfo(ctx context.Context, ids []string) ([]entity.GameInList, error)
-    GetCommentsGame(ctx context.Context, gameID string, limit, offset int) ([]entity.Comment, error)
+    GetCommentsGame(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
     AddComment(ctx context.Context, gameID, userID, text string) (string, error)
 }
 
