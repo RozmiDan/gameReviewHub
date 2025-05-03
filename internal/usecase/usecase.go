@@ -20,15 +20,15 @@ type RatingClient interface {
 }
 
 type GameRepository interface {
-    GetGameTopic(ctx context.Context, gameID string) (*entity.Game, error)
-    GetGameInfo(ctx context.Context, ids []string) ([]entity.GameInList, error)
-    GetCommentsGame(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
-    AddComment(ctx context.Context, gameID, userID, text string) (string, error)
+	GetGameTopic(ctx context.Context, gameID string) (*entity.Game, error)
+	GetGameInfo(ctx context.Context, ids []string) ([]entity.GameInList, error)
+	GetCommentsGame(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
+	AddComment(ctx context.Context, gameID, userID, text string) (string, error)
 }
 
 func New(ratingClient RatingClient, gameRepo GameRepository, logger *zap.Logger) *Usecase {
 
-	logger = logger.With(zap.String("layer", "mainService"))
+	logger = logger.With(zap.String("layer", "mainUsecase"))
 	return &Usecase{
 		ratingClient: ratingClient,
 		gameHubRepo:  gameRepo,

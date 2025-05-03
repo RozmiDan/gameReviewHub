@@ -25,7 +25,7 @@ type GameUseCase interface {
 	PostRating(ctx context.Context, gameID, userID string, rating int32) (bool, error)
 
 	GetListComments(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
-	AddComment(ctx context.Context, gameID, userID, text string) error
+	AddComment(ctx context.Context, gameID, userID, text string) (string, error)
 }
 
 func InitServer(cnfg *config.Config, logger *zap.Logger, uc GameUseCase) *http.Server {

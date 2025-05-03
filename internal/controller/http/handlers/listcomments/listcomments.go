@@ -53,33 +53,28 @@ func NewListCommentsHandler(baseLogger *zap.Logger, uc ListCommentsGetter) http.
 		// 5) вызываем бизнес-логику
 		comments, err := uc.GetListComments(ctx, gameID, limit, offset)
 		if err != nil {
-			// таймаут
-			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				logger.Error("timeout exceeded", zap.Error(err))
+			switch {
+			case errors.Is(err, entity.ErrTimeout):
+				logger.Error("timeout fetching comments", zap.Error(err))
 				render.Status(r, http.StatusGatewayTimeout)
 				render.JSON(w, r, ErrorResponse{
 					Error: APIError{"timeout_exceeded", "request took longer than 2s"},
 				})
-				return
-			}
-			// игра не найдена
-			if errors.Is(err, entity.ErrGameNotFound) {
-				logger.Info("game not found", zap.String("game_id", gameID))
-				render.Status(r, http.StatusNotFound)
+			case errors.Is(err, entity.ErrInternal):
+				logger.Error("internal error fetching comments", zap.Error(err))
+				render.Status(r, http.StatusInternalServerError)
 				render.JSON(w, r, ErrorResponse{
-					Error: APIError{"not_found", "game not found"},
+					Error: APIError{"internal_error", "could not fetch comments"},
 				})
-				return
+			default:
+				logger.Error("unexpected error fetching comments", zap.Error(err))
+				render.Status(r, http.StatusInternalServerError)
+				render.JSON(w, r, ErrorResponse{
+					Error: APIError{"internal_error", "could not fetch comments"},
+				})
 			}
-			// другая внутренняя ошибка
-			logger.Error("GetListComments failed", zap.Error(err))
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, ErrorResponse{
-				Error: APIError{"internal_error", "could not fetch comments"},
-			})
 			return
 		}
-
 		// 6) формируем и отдаем ответ
 		resp := ListCommentsResponse{
 			Data: comments,

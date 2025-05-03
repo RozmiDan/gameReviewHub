@@ -6,6 +6,10 @@ type PostCommentRequest struct {
 	Text   string `json:"text"`
 }
 
+type AddCommentResponse struct {
+    ID string `json:"id"`
+}
+
 // APIError — единая структура описания ошибки
 type APIError struct {
 	Code    string `json:"code"`    // машинно-читаемый код ошибки

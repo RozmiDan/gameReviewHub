@@ -1,6 +1,17 @@
 package entity
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrInsertComment    = errors.New("failed to insert comment")
+	ErrUnidentified     = errors.New("unidentified error")
+	ErrInternal         = errors.New("internal error")
+	ErrInternalComments = errors.New("could not fetch comments")
+	ErrTimeout          = errors.New("timeout exceeded")
+)
 
 type Comment struct {
 	ID        string    `json:"id"`

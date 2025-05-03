@@ -9,6 +9,7 @@ import (
 	"github.com/RozmiDan/gameReviewHub/internal/entity"
 	postgres_storage "github.com/RozmiDan/gameReviewHub/pkg/postgres"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"go.uber.org/zap"
 )
 
@@ -132,10 +133,17 @@ func (r *RatingRepository) GetCommentsGame(ctx context.Context, gameID string, l
 		ORDER BY created_at DESC
       	LIMIT $2 OFFSET $3
     `
-	rows, err := r.pg.Pool.Query(ctx, sqlQuery, gameID, limit, offset)
+
+	rows, err := r.pg.Pool.Query(ctx, sqlQuery, gameID, limit, offset*limit)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			// Invalid text representation, foreign key и тп
+			logger.Error("postgres error querying comments", zap.Error(err))
+			return nil, entity.ErrInternalComments
+		}
 		logger.Error("query failed", zap.Error(err))
-		return nil, err
+		return nil, entity.ErrInternalComments
 	}
 	defer rows.Close()
 
@@ -145,15 +153,15 @@ func (r *RatingRepository) GetCommentsGame(ctx context.Context, gameID string, l
 		var comment entity.Comment
 		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.Text, &comment.CreatedAt); err != nil {
 			logger.Error("scan failed", zap.Error(err))
-			return nil, err
+			return nil, entity.ErrInternalComments
 		}
 		comments = append(comments, comment)
 	}
 
 	if err := rows.Err(); err != nil {
-        logger.Error("rows iteration error", zap.Error(err))
-        return nil, err
-    }
+		logger.Error("rows iteration error", zap.Error(err))
+		return nil, entity.ErrInternalComments
+	}
 
 	logger.Info("fetched comments", zap.Int("found_records", len(comments)))
 
@@ -161,5 +169,37 @@ func (r *RatingRepository) GetCommentsGame(ctx context.Context, gameID string, l
 }
 
 func (r *RatingRepository) AddComment(ctx context.Context, gameID, userID, text string) (string, error) {
-	return "", nil
+	// 1) забираем request_id
+	reqID, _ := ctx.Value(entity.RequestIDKey{}).(string)
+
+	// 2) оборачиваем логгер
+	logger := r.logger.With(zap.String("func", "AddComment"))
+	if reqID != "" {
+		logger = logger.With(zap.String("request_id", reqID))
+	}
+
+	// 2) готовим и выполняем запрос
+	const sqlQuery = `
+        INSERT INTO comments(game_id, user_id, text)
+        VALUES($1, $2, $3)
+		RETURNING id
+    `
+
+	var commentID string
+	err := r.pg.Pool.QueryRow(ctx, sqlQuery, gameID, userID, text).Scan(&commentID)
+
+	if err != nil {
+		// если ключ game_id не существует → 23503 foreign_key_violation
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23503" {
+			logger.Info("game_id not found", zap.String("game_id", gameID))
+			return "", entity.ErrGameNotFound
+		}
+		logger.Error("failed to insert comment", zap.Error(err))
+		return "", entity.ErrInsertComment
+	}
+
+	logger.Info("successfuly insert comment", zap.String("commentID", commentID))
+
+	return commentID, nil
 }
