@@ -10,11 +10,12 @@ import (
 
 type (
 	Config struct {
-		Env        string     `yaml:"env" env:"ENV" env-default:"local"`
-		PostgreURL postgreURL `yaml:"postgres"`
-		AppInfo    appStruct  `yaml:"app"`
-		HttpInfo   httpStruct `yaml:"http"`
-		GrpcInfo   grpcStruct `yaml:"grpc"`
+		Env        string      `yaml:"env" env:"ENV" env-default:"local"`
+		PostgreURL postgreURL  `yaml:"postgres"`
+		AppInfo    appStruct   `yaml:"app"`
+		HttpInfo   httpStruct  `yaml:"http"`
+		GrpcInfo   grpcStruct  `yaml:"grpc"`
+		Kafka      KafkaConfig `yaml:"kafka"`
 	}
 
 	appStruct struct {
@@ -41,6 +42,13 @@ type (
 		User      string `yaml:"user" env-required:"true"`
 		Password  string `yaml:"password" env-required:"true"`
 		PgPoolMax uint16 `yaml:"pg_pool_max" env-required:"true"`
+	}
+
+	KafkaConfig struct {
+		Brokers      []string      `yaml:"brokers"`
+		TopicRatings string        `yaml:"topic_ratings"`
+		DialTimeout  time.Duration `yaml:"dial_timeout"`
+		WriteTimeout time.Duration `yaml:"write_timeout"`
 	}
 )
 

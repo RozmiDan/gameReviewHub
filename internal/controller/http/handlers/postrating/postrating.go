@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -17,7 +18,7 @@ import (
 // POST  /games/{game_id}/rating
 
 type RatingPoster interface {
-	PostRating(ctx context.Context, gameID, userID string, rating int32) (bool, error)
+	PostRating(ctx context.Context, gameID, userID string, rating int32) error
 }
 
 func NewRatingPostHandler(baseLogger *zap.Logger, uc RatingPoster) http.HandlerFunc {
@@ -85,10 +86,25 @@ func NewRatingPostHandler(baseLogger *zap.Logger, uc RatingPoster) http.HandlerF
 		}
 
 		// 6) Основная бизнес-логика
-		_, err := uc.PostRating(ctx, gameID, payload.UserID, payload.Rating)
-		if err != nil {
-			// если упёрлись в таймаут
-			if ctx.Err() == context.DeadlineExceeded {
+		if err := uc.PostRating(ctx, gameID, payload.UserID, payload.Rating); err != nil {
+			switch {
+			case errors.Is(err, entity.ErrBrokerUnavailable):
+				logger.Error("broker unavailable", zap.Error(err))
+				render.Status(r, http.StatusServiceUnavailable)
+				render.JSON(w, r, ErrorResponse{
+					Error: APIError{"service_unavailable", "unable to publish rating"},
+				})
+				return
+
+			case errors.Is(err, entity.ErrGameNotFound):
+				logger.Info("game not found", zap.String("game_id", gameID))
+				render.Status(r, http.StatusNotFound)
+				render.JSON(w, r, ErrorResponse{
+					Error: APIError{"not_found", "game not found"},
+				})
+				return
+
+			case errors.Is(err, context.DeadlineExceeded):
 				logger.Error("timeout exceeded", zap.Error(err))
 				render.Status(r, http.StatusGatewayTimeout)
 				render.JSON(w, r, ErrorResponse{
@@ -96,10 +112,11 @@ func NewRatingPostHandler(baseLogger *zap.Logger, uc RatingPoster) http.HandlerF
 				})
 				return
 			}
+
 			logger.Error("failed to post rating", zap.Error(err))
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, ErrorResponse{
-				Error: APIError{"post_rating_failed", "could not submit rating"},
+				Error: APIError{"internal error", "could not submit rating"},
 			})
 			return
 		}

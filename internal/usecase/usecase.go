@@ -11,6 +11,7 @@ type Usecase struct {
 	ratingClient RatingClient
 	gameHubRepo  GameRepository
 	logger       *zap.Logger
+	kafka        RatingProducer
 }
 
 type RatingClient interface {
@@ -26,12 +27,17 @@ type GameRepository interface {
 	AddComment(ctx context.Context, gameID, userID, text string) (string, error)
 }
 
-func New(ratingClient RatingClient, gameRepo GameRepository, logger *zap.Logger) *Usecase {
+type RatingProducer interface {
+	PublishRating(ctx context.Context, msg entity.RatingMessage) error
+}
+
+func New(ratingClient RatingClient, gameRepo GameRepository, logger *zap.Logger, ratingProd RatingProducer) *Usecase {
 
 	logger = logger.With(zap.String("layer", "mainUsecase"))
 	return &Usecase{
 		ratingClient: ratingClient,
 		gameHubRepo:  gameRepo,
 		logger:       logger,
+		kafka:        ratingProd,
 	}
 }

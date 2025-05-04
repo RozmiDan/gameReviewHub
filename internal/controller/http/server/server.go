@@ -22,7 +22,7 @@ type GameUseCase interface {
 	GetListGames(ctx context.Context, limit, offset int32) ([]entity.GameInList, error)
 	GetTopicGame(ctx context.Context, gameID string) (*entity.Game, error)
 
-	PostRating(ctx context.Context, gameID, userID string, rating int32) (bool, error)
+	PostRating(ctx context.Context, gameID, userID string, rating int32) error
 
 	GetListComments(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
 	AddComment(ctx context.Context, gameID, userID, text string) (string, error)

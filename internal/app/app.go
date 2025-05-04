@@ -15,6 +15,7 @@ import (
 	postgres_storage "github.com/RozmiDan/gameReviewHub/internal/repo/postgre"
 	"github.com/RozmiDan/gameReviewHub/internal/usecase"
 
+	"github.com/RozmiDan/gameReviewHub/pkg/kafka"
 	"github.com/RozmiDan/gameReviewHub/pkg/logger"
 	"github.com/RozmiDan/gameReviewHub/pkg/postgres"
 	"go.uber.org/zap"
@@ -46,8 +47,11 @@ func Run(cfg *config.Config) {
 		os.Exit(1)
 	}
 
+	// kafka
+	kafkaProducer := kafka.NewProducer(&cfg.Kafka, logger)
+
 	// usecase
-	uc := usecase.New(ratingService, repo, logger)
+	uc := usecase.New(ratingService, repo, logger, kafkaProducer)
 
 	// server
 	server := httpserver.InitServer(cfg, logger, uc)
