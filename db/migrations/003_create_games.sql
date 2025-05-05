@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS games (
   id           UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name         TEXT        NOT NULL,
+  name         TEXT        UNIQUE,
   genre        TEXT        NOT NULL DEFAULT 'Unknown',
   creator      TEXT        NOT NULL DEFAULT 'Unknown',
   description  TEXT        NOT NULL DEFAULT '',

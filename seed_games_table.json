@@ -1,0 +1,266 @@
+[
+    {
+        "id": "4b825dc6-1e82-4f38-9f8e-3a2f1b3c4d5e",
+        "name": "Overwatch 2",
+        "genre": "Hero shooter",
+        "creator": "Blizzard Entertainment",
+        "description": "Team-based hero shooter",
+        "release_date": "2022-10-04"
+    },
+    {
+        "id": "9c8ef1a2-3b4c-4d5e-8f9a-1bc2d3e4f5a6",
+        "name": "Valorant",
+        "genre": "Tactical shooter",
+        "creator": "Riot Games",
+        "description": "5v5 tactical FPS",
+        "release_date": "2020-06-02"
+    },
+    {
+        "id": "1a2b3c4d-5e6f-4a8b-9c0d-1e2f3a4b5c6d",
+        "name": "Minecraft",
+        "genre": "Sandbox",
+        "creator": "Mojang Studios",
+        "description": "Block-building sandbox game",
+        "release_date": "2011-11-18"
+    },
+    {
+        "id": "2b3c4d5e-6f7a-4b9c-0d1e-2f3a4b5c6d7e",
+        "name": "Fortnite",
+        "genre": "Battle royale",
+        "creator": "Epic Games",
+        "description": "Survival and building battle royale",
+        "release_date": "2017-07-21"
+    },
+    {
+        "id": "3c4d5e6f-7a8b-4c0d-1e2f-3a4b5c6d7e8f",
+        "name": "God of War",
+        "genre": "Action-adventure",
+        "creator": "Sony Santa Monica",
+        "description": "Mythology-based action-adventure",
+        "release_date": "2018-04-20"
+    },
+    {
+        "id": "4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f8a",
+        "name": "The Witcher 3: Wild Hunt",
+        "genre": "Action RPG",
+        "creator": "CD Projekt Red",
+        "description": "Open-world role-playing game",
+        "release_date": "2015-05-19"
+    },
+    {
+        "id": "5e6f7a8b-9c0d-4e1f-2a3b-4c5d6e7f8a9b",
+        "name": "Cyberpunk 2077",
+        "genre": "Action RPG",
+        "creator": "CD Projekt Red",
+        "description": "Futuristic open-world RPG",
+        "release_date": "2020-12-10"
+    },
+    {
+        "id": "6f7a8b9c-0d1e-4f2a-3b4c-5d6e7f8a9b0c",
+        "name": "Apex Legends",
+        "genre": "Battle royale",
+        "creator": "Respawn Entertainment",
+        "description": "Team-based battle royale",
+        "release_date": "2019-02-04"
+    },
+    {
+        "id": "7a8b9c0d-1e2f-4a3b-4c5d-6e7f8a9b0c1d",
+        "name": "League of Legends",
+        "genre": "MOBA",
+        "creator": "Riot Games",
+        "description": "Competitive multiplayer online battle arena",
+        "release_date": "2009-10-27"
+    },
+    {
+        "id": "8b9c0d1e-2f3a-4b4c-5d6e-7f8a9b0c1d2e",
+        "name": "Dota 2",
+        "genre": "MOBA",
+        "creator": "Valve",
+        "description": "Strategic multiplayer online battle arena",
+        "release_date": "2013-07-09"
+    },
+    {
+        "id": "9c0d1e2f-3a4b-4c5d-6e7f-8a9b0c1d2e3f",
+        "name": "Counter-Strike: Global Offensive",
+        "genre": "First-person shooter",
+        "creator": "Valve",
+        "description": "Tactical team-based FPS",
+        "release_date": "2012-08-21"
+    },
+    {
+        "id": "0d1e2f3a-4b5c-4d6e-7f8a-9b0c1d2e3f4a",
+        "name": "PUBG: Battlegrounds",
+        "genre": "Battle royale",
+        "creator": "PUBG Corporation",
+        "description": "First-person battle royale",
+        "release_date": "2017-12-20"
+    },
+    {
+        "id": "1e2f3a4b-5c6d-4e7f-8a9b-0c1d2e3f4a5b",
+        "name": "Elden Ring",
+        "genre": "Action RPG",
+        "creator": "FromSoftware",
+        "description": "Open-world dark fantasy RPG",
+        "release_date": "2022-02-25"
+    },
+    {
+        "id": "2f3a4b5c-6d7e-4f8a-9b0c-1d2e3f4a5b6c",
+        "name": "Halo Infinite",
+        "genre": "First-person shooter",
+        "creator": "343 Industries",
+        "description": "Sci-fi FPS",
+        "release_date": "2021-12-08"
+    },
+    {
+        "id": "3a4b5c6d-7e8f-4a9b-0c1d-2e3f4a5b6c7d",
+        "name": "Red Dead Redemption 2",
+        "genre": "Action-adventure",
+        "creator": "Rockstar Games",
+        "description": "Western open-world adventure",
+        "release_date": "2018-10-26"
+    },
+    {
+        "id": "4b5c6d7e-8f9a-4b0c-1d2e-3f4a5b6c7d8e",
+        "name": "Assassin’s Creed Valhalla",
+        "genre": "Action RPG",
+        "creator": "Ubisoft Montreal",
+        "description": "Viking-era action RPG",
+        "release_date": "2020-11-10"
+    },
+    {
+        "id": "5c6d7e8f-9a0b-4c1d-2e3f-4a5b6c7d8e9f",
+        "name": "Horizon Zero Dawn",
+        "genre": "Action-adventure",
+        "creator": "Guerrilla Games",
+        "description": "Post-apocalyptic action",
+        "release_date": "2017-02-28"
+    },
+    {
+        "id": "6d7e8f9a-0b1c-4d2e-3f4a-5b6c7d8e9f0a",
+        "name": "God of War Ragnarök",
+        "genre": "Action-adventure",
+        "creator": "Sony Santa Monica",
+        "description": "Norse mythology sequel",
+        "release_date": "2022-11-09"
+    },
+    {
+        "id": "7e8f9a0b-1c2d-4e3f-4a5b-6c7d8e9f0a1b",
+        "name": "Death Stranding",
+        "genre": "Action-adventure",
+        "creator": "Kojima Productions",
+        "description": "Strand-like social adventure",
+        "release_date": "2019-11-08"
+    },
+    {
+        "id": "8f9a0b1c-2d3e-4f4a-5b6c-7d8e9f0a1b2c",
+        "name": "Ghost of Tsushima",
+        "genre": "Action-adventure",
+        "creator": "Sucker Punch Productions",
+        "description": "Samurai open-world game",
+        "release_date": "2020-07-17"
+    },
+    {
+        "id": "9a0b1c2d-3e4f-4a5b-6c7d-8e9f0a1b2c3d",
+        "name": "Among Us",
+        "genre": "Social deduction",
+        "creator": "InnerSloth",
+        "description": "Multiplayer deception game",
+        "release_date": "2018-06-15"
+    },
+    {
+        "id": "0b1c2d3e-4f5a-4b6c-7d8e-9f0a1b2c3d4e",
+        "name": "Stardew Valley",
+        "genre": "Simulation RPG",
+        "creator": "ConcernedApe",
+        "description": "Farming simulation RPG",
+        "release_date": "2016-02-26"
+    },
+    {
+        "id": "1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f",
+        "name": "Hollow Knight",
+        "genre": "Metroidvania",
+        "creator": "Team Cherry",
+        "description": "Hand-drawn Metroidvania",
+        "release_date": "2017-02-24"
+    },
+    {
+        "id": "2d3e4f5a-6b7c-4d8e-9f0a-1b2c3d4e5f6a",
+        "name": "Celeste",
+        "genre": "Platformer",
+        "creator": "Maddy Makes Games",
+        "description": "Challenging precision platformer",
+        "release_date": "2018-01-25"
+    },
+    {
+        "id": "3e4f5a6b-7c8d-4e9f-0a1b-2c3d4e5f6a7b",
+        "name": "Ori and the Will of the Wisps",
+        "genre": "Metroidvania",
+        "creator": "Moon Studios",
+        "description": "Visually stunning Metroidvania",
+        "release_date": "2020-03-11"
+    },
+    {
+        "id": "4f5a6b7c-8d9e-4f0a-1b2c-3d4e5f6a7b8c",
+        "name": "Sekiro: Shadows Die Twice",
+        "genre": "Action-adventure",
+        "creator": "FromSoftware",
+        "description": "Samurai stealth combat",
+        "release_date": "2019-03-22"
+    },
+    {
+        "id": "5a6b7c8d-9e0f-4a1b-2c3d-4e5f6a7b8c9d",
+        "name": "Dark Souls III",
+        "genre": "Action RPG",
+        "creator": "FromSoftware",
+        "description": "Challenging dark fantasy RPG",
+        "release_date": "2016-03-24"
+    },
+    {
+        "id": "6b7c8d9e-0f1a-4b2c-3d4e-5f6a7b8c9d0e",
+        "name": "Bloodborne",
+        "genre": "Action RPG",
+        "creator": "FromSoftware",
+        "description": "Gothic horror RPG",
+        "release_date": "2015-03-24"
+    },
+    {
+        "id": "7c8d9e0f-1a2b-4c3d-4e5f-6a7b8c9d0e1f",
+        "name": "Resident Evil Village",
+        "genre": "Survival horror",
+        "creator": "Capcom",
+        "description": "Horror survival adventure",
+        "release_date": "2021-05-07"
+    },
+    {
+        "id": "8d9e0f1a-2b3c-4d4e-5f6a-7b8c9d0e1f2a",
+        "name": "The Last of Us Part II",
+        "genre": "Action-adventure",
+        "creator": "Naughty Dog",
+        "description": "Post-apocalyptic narrative adventure",
+        "release_date": "2020-06-19"
+    },
+    {
+        "id": "9e0f1a2b-3c4d-4e5f-6a7b-8c9d0e1f2a3b",
+        "name": "Metal Gear Solid V: The Phantom Pain",
+        "genre": "Stealth action",
+        "creator": "Kojima Productions",
+        "description": "Open-world stealth game",
+        "release_date": "2015-09-01"
+    },
+    {
+        "id": "0f1a2b3c-4d5e-4f6a-7b8c-9d0e1f2a3b4c",
+        "name": "Uncharted 4: A Thief’s End",
+        "genre": "Action-adventure",
+        "creator": "Naughty Dog",
+        "description": "Adventure treasure hunt",
+        "release_date": "2016-05-10"
+    },
+    {
+        "id": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+        "name": "Marvel’s Spider-Man",
+        "genre": "Action-adventure",
+        "creator": "Insomniac Games",
+        "description": "Superhero open-world game",
+        "release_date": "2018-09-07"
+    }
+]

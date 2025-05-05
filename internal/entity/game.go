@@ -1,6 +1,15 @@
 package entity
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrGameNotFound      = errors.New("game not found")
+	ErrGameAlreadyExists = errors.New("game already exists")
+	ErrInsertGame        = errors.New("failed to insert game")
+)
 
 type Game struct {
 	ID          string     `json:"id"`

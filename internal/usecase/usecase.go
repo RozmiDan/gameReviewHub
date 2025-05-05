@@ -25,6 +25,7 @@ type GameRepository interface {
 	GetGameInfo(ctx context.Context, ids []string) ([]entity.GameInList, error)
 	GetCommentsGame(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
 	AddComment(ctx context.Context, gameID, userID, text string) (string, error)
+	AddGameTopic(ctx context.Context, gameInfo *entity.Game) (string, error)
 }
 
 type RatingProducer interface {

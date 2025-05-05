@@ -8,6 +8,7 @@ import (
 	"github.com/RozmiDan/gameReviewHub/internal/entity"
 
 	addcomment "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/addcomment"
+	creategametopic "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/creategametopic"
 	gametopic "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/gametopic"
 	listcomments "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/listcomments"
 	mainpage "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/mainpage"
@@ -21,6 +22,7 @@ import (
 type GameUseCase interface {
 	GetListGames(ctx context.Context, limit, offset int32) ([]entity.GameInList, error)
 	GetTopicGame(ctx context.Context, gameID string) (*entity.Game, error)
+	CreateGameTopic(ctx context.Context, game *entity.Game) (string, error)
 
 	PostRating(ctx context.Context, gameID, userID string, rating int32) error
 
@@ -48,6 +50,9 @@ func InitServer(cnfg *config.Config, logger *zap.Logger, uc GameUseCase) *http.S
 	router.Route("/games", func(r chi.Router) {
 		// GET  /games?limit=&offset=
 		r.Get("/", mainpage.NewMainpageHandler(logger, uc))
+
+		// 2) POST /games   — создаём новую игру
+		r.Post("/", creategametopic.NewCreateGameHandler(logger, uc))
 
 		// для game_id
 		r.Route("/{game_id}", func(r chi.Router) {
