@@ -52,11 +52,11 @@ services:
       - internal
 
   rating_service:
-    build: .
+    build: /home/daniel/Documents/go_projects/highload_project/rating_service
     image: rating_service:latest
     container_name: rating_service
     volumes:
-      - ./logs/:/logs/
+      - /home/daniel/Documents/go_projects/highload_project/main_service/logs/:/logs/
     # restart: always
     depends_on:
       postgres:
@@ -74,14 +74,12 @@ services:
       - internal
 
   main_service:
-    build: /home/daniel/Documents/go_projects/highload_project/main_service
+    build: .
     image: main_service:latest
     container_name: main_service
     volumes:
-      - /home/daniel/Documents/go_projects/highload_project/main_service/logs/:/logs/
+      - ./logs/:/logs/
     restart: always
-    # volumes:
-      # - ...../logs/:/logs/
     depends_on:
       rating_service:
         condition: service_healthy
@@ -99,7 +97,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
     container_name: elasticsearch
     volumes:
-        - ./elk_resources/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+        - ./config/elk_resources/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     healthcheck:
         test: ["CMD", "curl", "-s", "-f", "http://localhost:9200/_cat/health"]
         interval: 3s
@@ -112,7 +110,7 @@ services:
     image: docker.elastic.co/logstash/logstash:7.6.2
     container_name: logstash
     volumes:
-        - ./elk_resources/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+        - ./config/elk_resources/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
     depends_on:
         elasticsearch:
             condition: service_healthy
@@ -131,9 +129,9 @@ services:
         logstash:
             condition: service_healthy
     volumes:
-        - ./elk_resources/filebeat.yml:/usr/share/filebeat/filebeat.yml
-        - ./logs/:/logs/rating_service/
-        - /home/daniel/Documents/go_projects/highload_project/main_service/logs/:/logs/main_service/
+        - ./config/elk_resources/filebeat.yml:/usr/share/filebeat/filebeat.yml
+        - ./logs/:/logs/main_service/
+        - /home/daniel/Documents/go_projects/highload_project/rating_service/logs/:/logs/rating_service/
     healthcheck:
         test: ["CMD", "filebeat", "test", "config", "-c", "/usr/share/filebeat/filebeat.yml"]
         interval: 3s
@@ -158,29 +156,29 @@ services:
     networks:
       - internal
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: 'prometheus'
-    restart: always
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - internal
-    depends_on:
-      - main_service
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: 'prometheus'
+  #   restart: always
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "9090:9090"
+  #   networks:
+  #     - internal
+  #   depends_on:
+  #     - main_service
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: 'grafana'
-    restart: always
-    ports:
-      - "3000:3000"
-    networks:
-      - internal
-    depends_on:
-      - prometheus
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: 'grafana'
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - internal
+  #   depends_on:
+  #     - prometheus
 
 
 volumes:

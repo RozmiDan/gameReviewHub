@@ -14,6 +14,7 @@ bin/
 configs/
 secrets/
 .env
+*.conf
 
 # Файлы IDE и редакторов
 .idea/
