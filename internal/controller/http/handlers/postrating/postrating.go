@@ -21,6 +21,21 @@ type RatingPoster interface {
 	PostRating(ctx context.Context, gameID, userID string, rating int32) error
 }
 
+// NewRatingPostHandler обрабатывает POST /games/{game_id}/rating — публикацию оценки игры.
+// @Summary     Поставить оценку игре
+// @Description Отправить новую оценку (1–10) для указанной игры
+// @Tags        games
+// @Accept      json
+// @Produce     json
+// @Param       game_id  path      string              true  "Идентификатор игры"
+// @Param       payload  body      PostRatingRequest   true  "Тело запроса с user_id и rating"
+// @Success     200      {object}  interface{}            "Пустой ответ — OK"
+// @Failure     400      {object}  ErrorResponse       "Некорректный запрос"
+// @Failure     404      {object}  ErrorResponse       "Игра не найдена"
+// @Failure     503      {object}  ErrorResponse       "Брокер недоступен"
+// @Failure     504      {object}  ErrorResponse       "Таймаут обработки запроса"
+// @Failure     500      {object}  ErrorResponse       "Внутренняя ошибка сервера"
+// @Router      /games/{game_id}/rating [post]
 func NewRatingPostHandler(baseLogger *zap.Logger, uc RatingPoster) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1) Получаем request_id и создаём новый контекст с таймаутом

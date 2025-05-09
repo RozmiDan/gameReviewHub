@@ -18,6 +18,19 @@ type GamesListGetter interface {
 	GetListGames(ctx context.Context, limit, offset int32) ([]entity.GameInList, error)
 }
 
+// ListGamesHandler возвращает список игр с пагинацией.
+// @Summary     Получить список игр
+// @Description Возвращает упорядоченный по id список игр с поддержкой limit/offset.
+// @Tags        games
+// @Accept      json
+// @Produce     json
+// @Param       limit   query     int  false  "Максимальное число игр"       default(10)
+// @Param       offset  query     int  false  "Смещение для пагинации"       default(0)
+// @Success     200     {object}  ListGamesResponse   "Список игр и мета"
+// @Failure     400     {object}  ErrorResponse       "Неверные параметры запроса"
+// @Failure     504     {object}  ErrorResponse       "Таймаут обработки запроса"
+// @Failure     500     {object}  ErrorResponse       "Внутренняя ошибка сервера"
+// @Router      /games [get]
 func NewMainpageHandler(baseLogger *zap.Logger, uc GamesListGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1) забираем request_id из middleware и кладем в ctx

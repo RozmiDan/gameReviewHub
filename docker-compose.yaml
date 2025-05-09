@@ -1,8 +1,8 @@
-version: "3.9"
-
+# docker-compose.yml
+version: '3.9'
 services:
   postgres:
-    container_name: 'highload_postgres'
+    container_name: 'postgres'
     image: postgres:17
     restart: always
     environment:
@@ -13,14 +13,154 @@ services:
       POSTGRES_PORT:      "${POSTGRES_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 5s
+      retries: 5
+    networks:
+      - internal
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.1
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - internal
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.1
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID:                         1
+      KAFKA_ZOOKEEPER_CONNECT:                zookeeper:2181
+      # слушаем на всех интерфейсах в контейнере
+      KAFKA_LISTENERS:                        PLAINTEXT://0.0.0.0:9092
+      # рекламируем своё внутреннее имя для других контейнеров
+      KAFKA_ADVERTISED_LISTENERS:             PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list"]
+      interval: 5s
+      retries: 10
+    networks:
+      - internal
+
+  rating_service:
+    build: .
+    image: rating_service:latest
+    container_name: rating_service
+    volumes:
+      - ./logs/:/logs/
+    # restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/50051 || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+    expose:
+      - "50051"
+    networks:
+      - internal
+
+  main_service:
+    build: /home/daniel/Documents/go_projects/highload_project/main_service
+    image: main_service:latest
+    container_name: main_service
+    volumes:
+      - /home/daniel/Documents/go_projects/highload_project/main_service/logs/:/logs/
+    restart: always
+    # volumes:
+      # - ...../logs/:/logs/
+    depends_on:
+      rating_service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/games?limit=10&offset=0"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
     ports:
-      - "5432:5432"
+      - "8080:8080"
+    networks:
+      - internal
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    container_name: elasticsearch
+    volumes:
+        - ./elk_resources/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    healthcheck:
+        test: ["CMD", "curl", "-s", "-f", "http://localhost:9200/_cat/health"]
+        interval: 3s
+        timeout: 3s
+        retries: 10
+    networks:
+      - internal
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.6.2
+    container_name: logstash
+    volumes:
+        - ./elk_resources/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    depends_on:
+        elasticsearch:
+            condition: service_healthy
+    healthcheck:
+        test: ["CMD-SHELL", "curl -s localhost:9600/_node/pipelines?pretty || exit 1"]
+        interval: 3s
+        timeout: 3s
+        retries: 50
+    networks:
+      - internal
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.5.1
+    container_name: filebeat
+    depends_on:
+        logstash:
+            condition: service_healthy
+    volumes:
+        - ./elk_resources/filebeat.yml:/usr/share/filebeat/filebeat.yml
+        - ./logs/:/logs/rating_service/
+        - /home/daniel/Documents/go_projects/highload_project/main_service/logs/:/logs/main_service/
+    healthcheck:
+        test: ["CMD", "filebeat", "test", "config", "-c", "/usr/share/filebeat/filebeat.yml"]
+        interval: 3s
+        timeout: 3s
+        retries: 50
+    networks:
+      - internal
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.6.2
+    container_name: kibana
+    depends_on:
+        elasticsearch:
+            condition: service_healthy
+    healthcheck:
+        test: ["CMD", "curl", "-s", "-f", "http://localhost:5601/api/status"]
+        interval: 3s
+        timeout: 3s
+        retries: 50
+    ports:
+        - 5601:5601
     networks:
       - internal
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: 'highload_prometheus'
+    container_name: 'prometheus'
     restart: always
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -29,11 +169,11 @@ services:
     networks:
       - internal
     depends_on:
-      - app
+      - main_service
 
   grafana:
     image: grafana/grafana:latest
-    container_name: 'highload_grafana'
+    container_name: 'grafana'
     restart: always
     ports:
       - "3000:3000"
@@ -42,31 +182,10 @@ services:
     depends_on:
       - prometheus
 
-#   app:
-#     build: .
-#     container_name: url_shortener_app
-#     restart: always 
-#     depends_on:
-#       - postgres
-#     environment:
-#       CONFIG_PATH: "/app/config.prod.yaml"
-#     ports:
-#       - "8080:8080"
-#     volumes:
-#       - ./config/config.prod.yaml:/app/config.prod.yaml
-#     working_dir: /app
-#     command: ["/app/url_shortener"]
-#     networks:
-#       - internal
-#     healthcheck:
-#       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
-#       interval: 5s
-#       timeout: 3s
-#       retries: 5
 
-# volumes:
-#   postgres_data:
+volumes:
+  postgres_data:
 
-# networks:
-#   internal:
-#     driver: bridge
+networks:
+  internal:
+    driver: bridge

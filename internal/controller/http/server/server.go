@@ -14,6 +14,9 @@ import (
 	mainpage "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/mainpage"
 	postrating "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/postrating"
 	middleware_main "github.com/RozmiDan/gameReviewHub/internal/controller/http/middleware/logger"
+	_ "github.com/RozmiDan/gameReviewHub/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"go.uber.org/zap"
@@ -47,6 +50,9 @@ func InitServer(cnfg *config.Config, logger *zap.Logger, uc GameUseCase) *http.S
 	// 	MaxAge:           300,
 	// }))
 
+	router.Get("/swagger/*", httpSwagger.WrapHandler)
+	//router.Handle("/metrics", promhttp.Handler())
+
 	router.Route("/games", func(r chi.Router) {
 		// GET  /games?limit=&offset=
 		r.Get("/", mainpage.NewMainpageHandler(logger, uc))
@@ -70,8 +76,6 @@ func InitServer(cnfg *config.Config, logger *zap.Logger, uc GameUseCase) *http.S
 			})
 		})
 	})
-	//router.Get("/swagger/*", httpSwagger.WrapHandler)
-	//router.Handle("/metrics", promhttp.Handler())
 
 	server := &http.Server{
 		Addr:         cnfg.HttpInfo.Port,

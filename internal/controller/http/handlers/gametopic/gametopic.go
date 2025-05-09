@@ -20,6 +20,19 @@ type TopicGameGetter interface {
 	GetTopicGame(ctx context.Context, gameID string) (*entity.Game, error)
 }
 
+// GetGameTopicHandler возвращает информацию об игре по её ID.
+// @Summary     Получить информацию об игре
+// @Description Возвращает все поля сущности Game для переданного UUID игры.
+// @Tags        games
+// @Accept      json
+// @Produce     json
+// @Param       game_id  path      string            true  "UUID игры"
+// @Success     200      {object}  GameTopicResponse "Данные игры"
+// @Failure     400      {object}  ErrorResponse     "Неверный формат UUID"
+// @Failure     404      {object}  ErrorResponse     "Игра не найдена"
+// @Failure     504      {object}  ErrorResponse     "Таймаут обработки запроса"
+// @Failure     500      {object}  ErrorResponse     "Внутренняя ошибка сервера"
+// @Router      /games/{game_id} [get]
 func NewGameTopicHandler(baseLogger *zap.Logger, uc TopicGameGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1) забираем request_id из middleware и кладем в ctx

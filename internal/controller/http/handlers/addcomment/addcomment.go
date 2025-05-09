@@ -21,6 +21,20 @@ type CommentPoster interface {
 	AddComment(ctx context.Context, gameID, userID, text string) (string, error)
 }
 
+// AddCommentHandler добавляет новый комментарий к игре.
+// @Summary     Постинг комментария
+// @Description Добавляет комментарий пользователя к указанной игре.
+// @Tags        comments
+// @Accept      json
+// @Produce     json
+// @Param       game_id   path     string             true  "UUID игры"
+// @Param       body      body     PostCommentRequest true  "Тело запроса с полем user_id и text"
+// @Success     200       {object} AddCommentResponse  "ID созданного комментария"
+// @Failure     400       {object} ErrorResponse        "Некорректные входные данные"
+// @Failure     404       {object} ErrorResponse        "Игра не найдена"
+// @Failure     504       {object} ErrorResponse        "Таймаут запроса"
+// @Failure     500       {object} ErrorResponse        "Внутренняя ошибка сервера"
+// @Router      /games/{game_id}/comments [post]
 func NewAddCommentHandler(baseLogger *zap.Logger, uc CommentPoster) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1) Получаем request_id и создаём новый контекст с таймаутом

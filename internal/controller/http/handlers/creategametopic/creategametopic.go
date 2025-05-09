@@ -21,6 +21,20 @@ type GameTopicCreator interface {
 	CreateGameTopic(ctx context.Context, game *entity.Game) (string, error)
 }
 
+// CreateGameHandler создаёт новую игру.
+// @Summary     Создание игры
+// @Description Создаёт запись о новой игре.
+// @Tags        games
+// @Accept      json
+// @Produce     json
+// @Param       body  body     CreateGameRequest  true  "Тело запроса"
+// @Success     201   {object} CreateGameResponse "Игра успешно создана"
+// @Header      201   {string} Location           "UUID созданного ресурса (/games/{id})"
+// @Failure     400   {object} ErrorResponse      "Некорректный запрос (невалидный UUID, отсутствие полей, неверный формат даты)"
+// @Failure     409   {object} ErrorResponse      "Конфликт — игра с таким именем уже существует"
+// @Failure     504   {object} ErrorResponse      "Таймаут обработки запроса"
+// @Failure     500   {object} ErrorResponse      "Внутренняя ошибка сервера"
+// @Router      /games [post]
 func NewCreateGameHandler(baseLogger *zap.Logger, uc GameTopicCreator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1) Получаем request_id и создаём новый контекст с таймаутом

@@ -1,28 +1,43 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"os"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+)
+
+// TODO: move to config
+const logPath = "./logs/go.log"
 
 func NewLogger(env string) *zap.Logger {
-	var logger *zap.Logger
-	var err error
+	var cfg zap.Config
+
+	os.OpenFile(logPath, os.O_RDONLY|os.O_CREATE, 0666)
 
 	switch env {
 	case "local":
-		config := zap.NewDevelopmentConfig()
-		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-		logger, err = config.Build()
+		cfg = zap.NewDevelopmentConfig()
+		cfg.Encoding = "json"
+		cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		cfg.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
 
 	case "prod":
-		config := zap.NewProductionConfig()
-		config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
-		logger, err = config.Build()
+		cfg = zap.NewProductionConfig()
+		cfg.Encoding = "json"
+		cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		cfg.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 
 	default:
-		// По умолчанию — production
-		config := zap.NewProductionConfig()
-		logger, err = config.Build()
+		cfg = zap.NewProductionConfig()
+		cfg.Encoding = "json"
+		cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		cfg.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 	}
 
+	cfg.OutputPaths = []string{"stdout", logPath}
+
+	logger, err := cfg.Build()
 	if err != nil {
 		return nil
 	}

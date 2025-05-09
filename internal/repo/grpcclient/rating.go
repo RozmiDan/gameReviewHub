@@ -2,6 +2,7 @@ package rating
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/RozmiDan/gameReviewHub/internal/entity"
@@ -10,7 +11,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
@@ -23,27 +23,24 @@ type Client struct {
 func New(ctx context.Context, log *zap.Logger, addr string,
 	timeout time.Duration) (*Client, error) {
 
-	conn, err := grpc.NewClient(addr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithChainUnaryInterceptor(
-			grpc_zap.UnaryClientInterceptor(log),
-			//grpc_prometheus.UnaryClientInterceptor,
-		),
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
 	dialCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	conn.Connect()
-	if !conn.WaitForStateChange(dialCtx, connectivity.Idle) {
-		conn.Close()
-		return nil, status.Error(codes.Unavailable, "could not connect to rating service")
+	// 2) блокирующий Dial — не вернётся, пока соединение не перейдёт в состояние READY или не истечёт dialCtx
+	conn, err := grpc.DialContext(
+		dialCtx,
+		addr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+		grpc.WithChainUnaryInterceptor(
+			grpc_zap.UnaryClientInterceptor(log),
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("cannot dial rating service at %s: %w", addr, err)
 	}
 
+	log.Info("connected to rating service", zap.String("addr", addr))
 	api := ratingv1.NewRatingServiceClient(conn)
 	return &Client{api: api, logger: log}, nil
 }
@@ -72,29 +69,29 @@ func (c *Client) GetGameRating(ctx context.Context, gameID string) (*entity.Game
 	})
 
 	if err != nil {
-        // если это gRPC-ошибка, разбираем код
-        if st, ok := status.FromError(err); ok {
-            switch st.Code() {
-            case codes.NotFound:
-                // просто нет оценок у игры
-                return nil, entity.ErrGameNotFound
+		// если это gRPC-ошибка, разбираем код
+		if st, ok := status.FromError(err); ok {
+			switch st.Code() {
+			case codes.NotFound:
+				// просто нет оценок у игры
+				return nil, entity.ErrGameNotFound
 
-            case codes.InvalidArgument:
-                // пришёл некорректный UUID
-                return nil, entity.ErrInvalidUUID
+			case codes.InvalidArgument:
+				// пришёл некорректный UUID
+				return nil, entity.ErrInvalidUUID
 
-            case codes.Unavailable, codes.DeadlineExceeded:
-                // сервис упал или вышли таймауты
-                return nil, entity.ErrServiceUnavailable
+			case codes.Unavailable, codes.DeadlineExceeded:
+				// сервис упал или вышли таймауты
+				return nil, entity.ErrServiceUnavailable
 
-            default:
-                // всё остальное — внутренняя ошибка
-                return nil, entity.ErrInternalRating
-            }
-        }
-        // не-gRPC-ошибка (например, сеть)
-        return nil, err
-    }
+			default:
+				// всё остальное — внутренняя ошибка
+				return nil, entity.ErrInternalRating
+			}
+		}
+		// не-gRPC-ошибка (например, сеть)
+		return nil, err
+	}
 
 	respGame := &entity.GameRating{
 		GameID:        resp.GetGameId(),

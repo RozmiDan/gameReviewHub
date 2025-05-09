@@ -21,6 +21,20 @@ type ListCommentsGetter interface {
 	GetListComments(ctx context.Context, gameID string, limit, offset int32) ([]entity.Comment, error)
 }
 
+// ListCommentsHandler возвращает список комментариев для указанной игры.
+// @Summary     Получить список комментариев
+// @Description Возвращает упорядоченный по убыванию даты список комментариев к игре.
+// @Tags        comments
+// @Accept      json
+// @Produce     json
+// @Param       game_id  path      string            true  "UUID игры"
+// @Param       limit    query     int               false "Максимальное число комментариев"  default(10)
+// @Param       offset   query     int               false "Сдвиг для пагинации"            default(0)
+// @Success     200      {object}  ListCommentsResponse "Список комментариев и мета"
+// @Failure     400      {object}  ErrorResponse         "Неверные параметры запроса"
+// @Failure     504      {object}  ErrorResponse         "Таймаут обработки запроса"
+// @Failure     500      {object}  ErrorResponse         "Внутренняя ошибка сервера"
+// @Router      /games/{game_id}/comments [get]
 func NewListCommentsHandler(baseLogger *zap.Logger, uc ListCommentsGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 1) request_id и таймаут
