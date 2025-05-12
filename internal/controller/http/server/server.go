@@ -6,19 +6,21 @@ import (
 
 	"github.com/RozmiDan/gameReviewHub/internal/config"
 	"github.com/RozmiDan/gameReviewHub/internal/entity"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	_ "github.com/RozmiDan/gameReviewHub/docs"
 	addcomment "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/addcomment"
 	creategametopic "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/creategametopic"
 	gametopic "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/gametopic"
 	listcomments "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/listcomments"
 	mainpage "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/mainpage"
 	postrating "github.com/RozmiDan/gameReviewHub/internal/controller/http/handlers/postrating"
-	middleware_main "github.com/RozmiDan/gameReviewHub/internal/controller/http/middleware/logger"
-	_ "github.com/RozmiDan/gameReviewHub/docs"
+	middleware_logger "github.com/RozmiDan/gameReviewHub/internal/controller/http/middleware/logger"
+	middleware_metrics "github.com/RozmiDan/gameReviewHub/internal/controller/http/middleware/metrics"
 
-	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
 )
 
@@ -39,9 +41,11 @@ func InitServer(cnfg *config.Config, logger *zap.Logger, uc GameUseCase) *http.S
 	router := chi.NewRouter()
 
 	router.Use(middleware.RequestID)
-	router.Use(middleware_main.MyLogger(logger))
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
+	router.Use(middleware_metrics.PrometheusMiddleware)
+	router.Use(middleware_logger.MyLogger(logger))
+
 	// router.Use(cors.Handler(cors.Options{
 	// 	AllowedOrigins:   []string{"*"},
 	// 	AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -51,7 +55,7 @@ func InitServer(cnfg *config.Config, logger *zap.Logger, uc GameUseCase) *http.S
 	// }))
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
-	//router.Handle("/metrics", promhttp.Handler())
+	router.Handle("/metrics", promhttp.Handler())
 
 	router.Route("/games", func(r chi.Router) {
 		// GET  /games?limit=&offset=

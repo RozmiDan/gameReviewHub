@@ -1,4 +1,4 @@
-package middleware_main
+package middleware_logger
 
 import (
 	"net/http"
@@ -9,9 +9,7 @@ import (
 )
 
 func MyLogger(log *zap.Logger) func(next http.Handler) http.Handler {
-
 	return func(next http.Handler) http.Handler {
-
 		log = log.With(zap.String("component", "middleware/logger"))
 		log.Info("logger middleware enabled")
 

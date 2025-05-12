@@ -17,6 +17,7 @@ import (
 
 	"github.com/RozmiDan/gameReviewHub/pkg/kafka"
 	"github.com/RozmiDan/gameReviewHub/pkg/logger"
+	prom_metrics "github.com/RozmiDan/gameReviewHub/pkg/metrics"
 	"github.com/RozmiDan/gameReviewHub/pkg/postgres"
 	"go.uber.org/zap"
 )
@@ -48,8 +49,12 @@ func Run(cfg *config.Config) {
 		os.Exit(1)
 	}
 
+	// инициализируем метрики
+	prom_metrics.Init()
+
 	// kafka
 	kafkaProducer := kafka.NewProducer(&cfg.Kafka, logger)
+	//kafkaProducer := &RatingProducer{}
 
 	// usecase
 	uc := usecase.New(ratingService, repo, logger, kafkaProducer)
@@ -84,25 +89,9 @@ func Run(cfg *config.Config) {
 	logger.Info("Finishing programm")
 }
 
-// ids := []string{
-// 	"06bb8cf0-c346-4681-a2f1-5b90d96120b5",
-// 	"437c3a12-3008-4f5a-848e-352b6f1386da",
-// 	"c1356b34-cd5f-4358-b4e0-94bbf5527321",
-// 	"4e3bea4b-b58d-46e0-8424-af0ed96a069b",
-// 	"0905184c-0445-44b9-8a75-9cffab9a85b9",
-// 	// "8a72872d-f514-4b28-8a90-ea554ca90616",
-// 	// "920ffc7b-91c5-4480-afb4-1a22a6ce7373",
-// 	// "1a72872d-f514-4b28-8a90-ea554ca90616",
-// 	// "220ffc7b-91c5-4480-afb4-1a22a6ce7373",
-// 	// "f683e3de-ef27-470e-b909-9e5f30d9c174",
+// type RatingProducer struct {
 // }
 
-// list, err := repo.GetGameInfo(context.TODO(), ids)
-// if err != nil {
-// 	logger.Error("errooooooor", zap.Error(err))
-// }
-// for _, it := range list {
-// 	logger.Info("response", zap.String("g", it.Genre), zap.String("id", it.ID),
-// 		zap.String("n", it.Name),
-// 	)
+// func (*RatingProducer) PublishRating(ctx context.Context, msg entity.RatingMessage) error {
+// 	return nil
 // }

@@ -1,4 +1,4 @@
-.PHONY: run-app db-up db-down
+.PHONY: run-app db-up db-down integration-up integration-down integration-test run-test
 
 include .env
 export
@@ -23,3 +23,19 @@ db-up:
 db-down:
 	@echo "Остановка контейнера PostgreSQL..."
 	docker stop local-postgres
+
+integration-up:
+	docker compose -f docker-compose-integration-test.yaml up -d
+
+integration-test: integration-up
+	go test -v ./integration-test/...
+	sleep 2
+	make integration-down
+
+integration-down:
+	docker compose -f docker-compose-integration-test.yaml down
+
+run-test: integration-up
+	go test -v ./...
+	sleep 1
+	make integration-down
