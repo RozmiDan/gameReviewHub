@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  testdb:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: testdb
+    ports: 
+      - "5432:5432" 
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "test"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    networks:
+      - testnet
+
+networks:
+  testnet:
+    driver: bridge

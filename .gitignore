@@ -10,7 +10,6 @@ bin/
 *.env
 *.yaml
 *.yml
-!docker-compose.yaml
 configs/
 secrets/
 .env
@@ -43,3 +42,7 @@ tmp/
 # Прочее
 *.db
 *.sqlite
+
+!docker-compose.yaml
+!docker-compose-integration-test.yaml
+!ci.yml
