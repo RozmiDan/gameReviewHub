@@ -39,3 +39,33 @@ run-test: integration-up
 	go test -v ./...
 	sleep 1
 	make integration-down
+
+
+# === Tsung Load Testing ===
+
+TSUNG_STATS := /usr/lib/x86_64-linux-gnu/tsung/bin/tsung_stats.pl
+TSUNG_LOGDIR := load-test/result
+TSUNG_SCENARIO ?= load-test/low_users_scenario.xml
+
+.PHONY: tsung-run tsung-report tsung-open tsung-all tsung-clean
+
+tsung-run:
+	@echo "===> Запуск Tsung-теста: $(TSUNG_SCENARIO)"
+	@tsung -f $(TSUNG_SCENARIO) -l $(TSUNG_LOGDIR) start
+
+tsung-report:
+	@echo "===> Генерация отчёта Tsung..."
+	@latest_log=$$(ls -dt $(TSUNG_LOGDIR)/* | head -n1) && \
+	cd $$latest_log && \
+	perl $(TSUNG_STATS)
+
+tsung-open:
+	@echo "===> Открытие отчёта Tsung в браузере..."
+	@latest_log=$$(ls -dt $(TSUNG_LOGDIR)/* | head -n1) && \
+	xdg-open $$latest_log/report.html
+
+tsung-all: tsung-run tsung-report tsung-open
+
+tsung-clean:
+	@echo "===> Удаление всех логов Tsung..."
+	@rm -rf $(TSUNG_LOGDIR)/*

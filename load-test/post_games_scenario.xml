@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+
+<tsung loglevel="notice" version="1.0">
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+
+  <servers>
+    <server host="localhost" port="8080" type="tcp"/>
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="1" unit="second">
+      <users arrivalrate="33" unit="second"/>
+    </arrivalphase>
+  </load>
+
+  <sessions>
+    <session name="post_multiple_games" probability="100" type="ts_http">
+      <for from="1" to="33" var="i">
+        <request subst="true">
+          <http url="/games/" method="POST" version="1.1" content_type="application/json">
+            <body file="load-test/post_games_payloads/game_%%i.json"/>
+          </http>
+        </request>
+      </for>
+    </session>
+  </sessions>
+</tsung>

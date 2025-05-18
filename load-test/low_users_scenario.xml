@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+
+<tsung loglevel="notice" version="1.0">
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+
+  <servers>
+    <server host="localhost" port="8080" type="tcp"/>
+  </servers>
+
+  <load>
+    <!-- 100 пользователей появляются за 5 секунд -->
+    <arrivalphase phase="1" duration="5" unit="second">
+      <users arrivalrate="20" unit="second"/>
+    </arrivalphase>
+  </load>
+
+  <sessions>
+    <session name="fixed_count_loop" probability="100" type="ts_http">
+      <for from="1" to="30" var="i">
+        <request>
+          <http url="/games?limit=10" method="GET" version="1.1"/>
+        </request>
+        <thinktime value="2"/>
+      </for>
+    </session>
+  </sessions>
+</tsung>

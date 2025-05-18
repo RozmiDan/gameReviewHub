@@ -37,7 +37,9 @@ func NewLogger(env string) *zap.Logger {
 	}
 	cfg.Encoding = "json"
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	cfg.OutputPaths = []string{"stdout", logPath}
+
+	//cfg.OutputPaths = []string{"stdout", logPath}
+	cfg.OutputPaths = []string{logPath}
 
 	logger, err := cfg.Build()
 	if err != nil {
