@@ -16,8 +16,16 @@ func PrometheusMiddleware(next http.Handler) http.Handler {
 
 		rw := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
-		timer := prometheus.NewTimer(prom_metrics.HTTPDuration.WithLabelValues(method, path))
-		defer timer.ObserveDuration()
+		prom_metrics.HTTPInFlight.WithLabelValues(method, path).Inc()
+        defer prom_metrics.HTTPInFlight.WithLabelValues(method, path).Dec()
+
+		histTimer := prometheus.NewTimer(prom_metrics.HTTPDuration.WithLabelValues(method, path))
+        defer func() {
+            histTimer.ObserveDuration()
+        }()
+
+		// timer := prometheus.NewTimer(prom_metrics.HTTPDuration.WithLabelValues(method, path))
+		// defer timer.ObserveDuration()
 
 		next.ServeHTTP(rw, r)
 
