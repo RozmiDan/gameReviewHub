@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+
+<tsung loglevel="notice" version="1.0">
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+
+  <servers>
+    <server host="localhost" port="8080" type="tcp"/>
+  </servers>
+
+  <load duration="30" unit="second">
+    <arrivalphase phase="1" duration="5" unit="second">
+      <users arrivalrate="20" unit="second" maxnumber="100"/>
+    </arrivalphase>
+  </load>
+
+  <options>
+    <option name="file_server" id="get_games_urls" value="load-test/get_games_urls.csv"/>
+  </options>
+
+  <sessions>
+    <session name="get_games_by_id" probability="100" type="ts_http">
+      <for from="1" to="20" var="i">
+        <setdynvars sourcetype="file" fileid="get_games_urls" delimiter="\n" order="random">
+          <var name="url"/>
+        </setdynvars>
+
+        <request subst="true">
+          <http url="%%_url%%" method="GET" version="1.1"/>
+        </request>
+      </for>
+    </session>
+  </sessions>
+</tsung>

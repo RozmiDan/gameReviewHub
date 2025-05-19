@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	HTTPRequests        *prometheus.CounterVec
-	HTTPDuration        *prometheus.HistogramVec
-	HTTPInFlight        *prometheus.GaugeVec
-	DBErrors            *prometheus.CounterVec
-	KafkaPublishErrors  *prometheus.CounterVec
+	HTTPRequests       *prometheus.CounterVec
+	HTTPDuration       *prometheus.HistogramVec
+	HTTPInFlight       *prometheus.GaugeVec
+	DBErrors           *prometheus.CounterVec
+	KafkaPublishErrors *prometheus.CounterVec
 )
 
 func Init() {
@@ -24,7 +24,8 @@ func Init() {
 			Name:      "requests_total",
 			Help:      "Количество HTTP-запросов.",
 		},
-		[]string{"method", "path", "status"},
+		// []string{"method", "path", "status"},
+		[]string{"method", "status"},
 	)
 
 	HTTPDuration = prometheus.NewHistogramVec(
@@ -35,7 +36,8 @@ func Init() {
 			Help:      "Распределение длительности HTTP запросов",
 			Buckets:   []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10},
 		},
-		[]string{"method", "path"},
+		[]string{"method"},
+		//[]string{"method", "path"},
 	)
 
 	HTTPInFlight = prometheus.NewGaugeVec(
@@ -45,7 +47,8 @@ func Init() {
 			Name:      "inflight_requests",
 			Help:      "Текущее число обрабатываемых HTTP запросов",
 		},
-		[]string{"method", "path"},
+		//[]string{"method", "path"},
+		[]string{"method"},
 	)
 	DBErrors = prometheus.NewCounterVec(
 		prometheus.CounterOpts{

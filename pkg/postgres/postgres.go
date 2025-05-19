@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// TODO: Move to config
 const (
 	_defaultMaxPoolSize  = 1
 	_defaultConnAttempts = 10

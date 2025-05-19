@@ -33,7 +33,7 @@ func Run(cfg *config.Config) {
 	logger.Info("Migrations completed successfully\n")
 
 	// repo
-	pg, err := postgres.New(cfg.PostgreURL.URL, postgres.MaxPoolSize(4))
+	pg, err := postgres.New(cfg.PostgreURL.URL, postgres.MaxPoolSize(25))
 	if err != nil {
 		logger.Error("Cant open database", zap.Error(err))
 		os.Exit(1)

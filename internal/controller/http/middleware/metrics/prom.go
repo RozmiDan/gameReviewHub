@@ -11,18 +11,18 @@ import (
 
 func PrometheusMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		path := r.URL.Path
+		//path := r.URL.Path
 		method := r.Method
 
 		rw := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
-		prom_metrics.HTTPInFlight.WithLabelValues(method, path).Inc()
-        defer prom_metrics.HTTPInFlight.WithLabelValues(method, path).Dec()
+		prom_metrics.HTTPInFlight.WithLabelValues(method).Inc()
+		defer prom_metrics.HTTPInFlight.WithLabelValues(method).Dec()
 
-		histTimer := prometheus.NewTimer(prom_metrics.HTTPDuration.WithLabelValues(method, path))
-        defer func() {
-            histTimer.ObserveDuration()
-        }()
+		histTimer := prometheus.NewTimer(prom_metrics.HTTPDuration.WithLabelValues(method))
+		defer func() {
+			histTimer.ObserveDuration()
+		}()
 
 		// timer := prometheus.NewTimer(prom_metrics.HTTPDuration.WithLabelValues(method, path))
 		// defer timer.ObserveDuration()
@@ -30,6 +30,6 @@ func PrometheusMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, r)
 
 		status := strconv.Itoa(rw.Status())
-		prom_metrics.HTTPRequests.WithLabelValues(method, path, status).Inc()
+		prom_metrics.HTTPRequests.WithLabelValues(method, status).Inc()
 	})
 }

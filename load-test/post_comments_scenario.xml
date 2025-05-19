@@ -11,25 +11,26 @@
   </servers>
 
   <load>
-    <arrivalphase phase="1" duration="1" unit="second">
-      <users arrivalrate="33" unit="second"/>
+    <arrivalphase phase="1" duration="2" unit="second">
+      <users arrivalrate="40" unit="second"/>
     </arrivalphase>
   </load>
 
   <options>
-    <option name="file_server" id="games" value="load-test/games.csv"/>
+    <option name="file_server" id="comments" value="load-test/comments.csv"/>
   </options>
 
   <sessions>
-    <session name="post_games_from_csv" probability="100" type="ts_http">
-      <setdynvars sourcetype="file" fileid="games" delimiter="\n" order="iter">
-        <var name="json"/>
+    <session name="post_comments_from_csv" probability="100" type="ts_http">
+      <setdynvars sourcetype="file" fileid="comments" delimiter=";" order="iter">
+        <var name="url"/>
+        <var name="body"/>
       </setdynvars>
 
       <request subst="true">
-        <http url="/games/" method="POST" version="1.1"
+        <http url="%%_url%%" method="POST" version="1.1"
               content_type="application/json"
-              contents="%%_json%%"/>
+              contents="%%_body%%"/>
       </request>
     </session>
   </sessions>
