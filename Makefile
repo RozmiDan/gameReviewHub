@@ -1,4 +1,4 @@
-.PHONY: run-app db-up db-down integration-up integration-down integration-test run-test
+.PHONY: run-app db-up db-down integration-up integration-down integration-test run-test tsung_seed
 
 include .env
 export
@@ -69,3 +69,5 @@ tsung-all: tsung-run tsung-report tsung-open
 tsung-clean:
 	@echo "===> Удаление всех логов Tsung..."
 	@rm -rf $(TSUNG_LOGDIR)/*
+
+

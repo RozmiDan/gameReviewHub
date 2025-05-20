@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+
+<tsung loglevel="notice" version="1.0">
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+
+  <servers>
+    <server host="localhost" port="8080" type="tcp"/>
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="60" unit="second">
+      <users arrivalrate="50" unit="second" maxnumber="500"/>
+    </arrivalphase>
+  </load>
+
+  <sessions>
+    <session name="mp_low_rate_many_users" probability="100" type="ts_http">
+      <for from="1" to="3" var="i">
+        <request>
+          <http url="/games?limit=10&amp;offset=0" method="GET" version="1.1"/>
+        </request>
+        <thinktime value="5"/>
+      </for>
+    </session>
+  </sessions>
+</tsung>

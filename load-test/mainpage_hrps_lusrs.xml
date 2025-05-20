@@ -11,20 +11,21 @@
   </servers>
 
   <load>
-    <!-- 100 пользователей появляются за 5 секунд -->
-    <arrivalphase phase="1" duration="5" unit="second">
-      <users arrivalrate="20" unit="second"/>
+    <arrivalphase phase="1" duration="60" unit="second">
+      <users arrivalrate="5" unit="second" maxnumber="50"/>
     </arrivalphase>
   </load>
 
   <sessions>
-    <session name="fixed_count_loop" probability="100" type="ts_http">
-      <for from="1" to="30" var="i">
+    <session name="mp_high_rate_few_users" probability="100" type="ts_http">
+      <for from="1" to="60" var="i">
         <request>
-          <http url="/games?limit=10" method="GET" version="1.1"/>
+          <http url="/games?limit=10&amp;offset=0" method="GET" version="1.1"/>
         </request>
-        <thinktime value="2"/>
+        <thinktime value="1"/>
       </for>
     </session>
   </sessions>
 </tsung>
+
+

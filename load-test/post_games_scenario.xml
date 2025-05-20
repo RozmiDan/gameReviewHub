@@ -11,8 +11,8 @@
   </servers>
 
   <load>
-    <arrivalphase phase="1" duration="1" unit="second">
-      <users arrivalrate="33" unit="second"/>
+    <arrivalphase phase="1" duration="5" unit="second">
+      <users arrivalrate="10" unit="second"/>
     </arrivalphase>
   </load>
 

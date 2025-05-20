@@ -56,7 +56,7 @@ services:
     image: rating_service:latest
     container_name: rating_service
     volumes:
-      - /home/daniel/Documents/go_projects/highload_project/main_service/logs/:/logs/
+      - /home/daniel/Documents/go_projects/highload_project/rating_service/logs/:/logs/
     # restart: always
     depends_on:
       postgres:
