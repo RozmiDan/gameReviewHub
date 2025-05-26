@@ -1,4 +1,4 @@
-.PHONY: run-app db-up db-down integration-up integration-down integration-test run-test tsung_seed
+.PHONY: run-app db-up db-down integration-up integration-down integration-test run-test
 
 include .env
 export
@@ -46,6 +46,7 @@ run-test: integration-up
 TSUNG_STATS := /usr/lib/x86_64-linux-gnu/tsung/bin/tsung_stats.pl
 TSUNG_LOGDIR := load-test/result
 TSUNG_SCENARIO ?= load-test/low_users_scenario.xml
+TSUNG_LOG ?= $(shell ls -dt $(TSUNG_LOGDIR)/* | head -n1)
 
 .PHONY: tsung-run tsung-report tsung-open tsung-all tsung-clean
 
@@ -54,15 +55,12 @@ tsung-run:
 	@tsung -f $(TSUNG_SCENARIO) -l $(TSUNG_LOGDIR) start
 
 tsung-report:
-	@echo "===> Генерация отчёта Tsung..."
-	@latest_log=$$(ls -dt $(TSUNG_LOGDIR)/* | head -n1) && \
-	cd $$latest_log && \
-	perl $(TSUNG_STATS)
+	@echo "===> Генерация отчёта Tsung из: $(TSUNG_LOG)"
+	@cd $(TSUNG_LOG) && perl $(TSUNG_STATS)
 
 tsung-open:
-	@echo "===> Открытие отчёта Tsung в браузере..."
-	@latest_log=$$(ls -dt $(TSUNG_LOGDIR)/* | head -n1) && \
-	xdg-open $$latest_log/report.html
+	@echo "===> Открытие отчёта Tsung в браузере: $(TSUNG_LOG)"
+	@xdg-open $(TSUNG_LOG)/report.html
 
 tsung-all: tsung-run tsung-report tsung-open
 

@@ -195,7 +195,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "gamehub_http_server_requests_total{path!=\"/metrics\"}",
+          "expr": "gamehub_http_server_requests_total{path!=\"/metrics\", job=\"main_service\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -565,13 +565,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "process_resident_memory_bytes\n",
+          "expr": "process_resident_memory_bytes / 1024 / 1024\n",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Memory Usage (RSS)",
+      "title": "Memory Usage (MiB)",
       "type": "timeseries"
     },
     {
@@ -621,7 +621,7 @@
           ],
           "show": false
         },
-        "frameIndex": 0,
+        "frameIndex": 1,
         "showHeader": true
       },
       "pluginVersion": "11.6.0",
@@ -653,5 +653,5 @@
   "timezone": "browser",
   "title": "New dashboard",
   "uid": "eem9oygsvol4wc",
-  "version": 4
+  "version": 1
 }
