@@ -108,6 +108,7 @@ func TestGetListGames(t *testing.T) {
 				&fakeGameRepo{metas: tc.metas, err: tc.metaErr},
 				logger,
 				nil,
+				nopCache,
 			)
 
 			out, err := uc.GetListGames(ctx, 10, 0)

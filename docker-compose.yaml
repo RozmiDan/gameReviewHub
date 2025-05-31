@@ -12,6 +12,18 @@ services:
     networks:
       - internal
 
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      retries: 5
+    networks:
+      - internal
+
   postgres:
     container_name: 'postgres'
     image: postgres:17
@@ -95,8 +107,11 @@ services:
       - ./logs/:/logs/
     restart: always
     depends_on:
-      rating_service:
-        condition: service_healthy
+      - rating_service
+        # condition: service_healthy
+      - redis
+        # condition: service_healthy
+      - postgres
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/games?limit=10&offset=0"]
       interval: 5s

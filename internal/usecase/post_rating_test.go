@@ -112,6 +112,7 @@ func TestUsecase_PostRating(t *testing.T) {
 				repo,
 				logger,
 				prod,
+				nopCache,
 			)
 
 			err := uc.PostRating(ctx, gameID, userID, rate)

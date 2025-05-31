@@ -82,6 +82,7 @@ func TestCreateGameTopic(t *testing.T) {
 				&mockGameRepo{returnID: tc.repoID, returnErr: tc.repoErr},
 				logger,
 				nopProducer,
+				nopCache,
 			)
 
 			gotID, gotErr := uc.CreateGameTopic(ctx, testGame)

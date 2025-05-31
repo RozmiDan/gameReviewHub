@@ -9,6 +9,7 @@ var (
 	ErrGameNotFound      = errors.New("game not found")
 	ErrGameAlreadyExists = errors.New("game already exists")
 	ErrInsertGame        = errors.New("failed to insert game")
+	ErrCacheMiss         = errors.New("no data in redis")
 )
 
 type Game struct {

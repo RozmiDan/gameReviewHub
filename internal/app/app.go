@@ -13,6 +13,7 @@ import (
 	httpserver "github.com/RozmiDan/gameReviewHub/internal/controller/http/server"
 	rating "github.com/RozmiDan/gameReviewHub/internal/repo/grpcclient"
 	postgres_storage "github.com/RozmiDan/gameReviewHub/internal/repo/postgre"
+	redis_build "github.com/RozmiDan/gameReviewHub/internal/repo/redis"
 	"github.com/RozmiDan/gameReviewHub/internal/usecase"
 
 	"github.com/RozmiDan/gameReviewHub/pkg/kafka"
@@ -56,8 +57,12 @@ func Run(cfg *config.Config) {
 	kafkaProducer := kafka.NewProducer(&cfg.Kafka, logger)
 	//kafkaProducer := &RatingProducer{}
 
+	// redis
+	redisClient := redis_build.NewRedisClient(cfg.Redis.RedisAddress, cfg.Redis.RedisPassword,
+		cfg.Redis.RedisDB, cfg.Redis.RedisTTL, logger)
+
 	// usecase
-	uc := usecase.New(ratingService, repo, logger, kafkaProducer)
+	uc := usecase.New(ratingService, repo, logger, kafkaProducer, redisClient)
 
 	// server
 	server := httpserver.InitServer(cfg, logger, uc)

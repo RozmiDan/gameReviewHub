@@ -11,7 +11,7 @@ import (
 )
 
 type mockRepo struct {
-	returnID string
+	returnID  string
 	returnErr error
 }
 
@@ -33,6 +33,7 @@ func (m *mockRepo) AddGameTopic(ctx context.Context, gameInfo *entity.Game) (str
 
 var nopRatingClient RatingClient = nil
 var nopProducer RatingProducer = nil
+var nopCache CacheClient = nil
 
 func TestAddComment(t *testing.T) {
 	ctx := context.Background()
@@ -45,11 +46,11 @@ func TestAddComment(t *testing.T) {
 	)
 
 	tests := []struct {
-		name        string
-		repoErr     error
-		repoID      string
-		wantID      string
-		wantErr     error
+		name    string
+		repoErr error
+		repoID  string
+		wantID  string
+		wantErr error
 	}{
 		{
 			name:    "game not found",
@@ -82,6 +83,7 @@ func TestAddComment(t *testing.T) {
 				&mockRepo{returnID: tc.repoID, returnErr: tc.repoErr},
 				logger,
 				nopProducer,
+				nopCache,
 			)
 
 			gotID, gotErr := uc.AddComment(ctx, gameID, userID, text)

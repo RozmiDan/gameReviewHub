@@ -2,6 +2,9 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/RozmiDan/gameReviewHub/internal/entity"
 	"go.uber.org/zap"
@@ -9,14 +12,30 @@ import (
 
 // ListGames получает топ-N игр с учётом пагинации
 func (u *Usecase) GetListGames(ctx context.Context, limit, offset int32) ([]entity.GameInList, error) {
-	//(RPC → БД → merge)
-
+	//(cache(?) → RPC → БД → merge → cache(?))
 	reqID, _ := ctx.Value(entity.RequestIDKey{}).(string)
 	logger := u.logger
 	if reqID != "" {
 		logger = logger.With(zap.String("request_id", reqID))
 	}
 	logger = logger.With(zap.String("func", "GetListGames"))
+
+	// Cache
+	cacheKey := fmt.Sprintf("listgames:%d:%d", limit, offset)
+
+	if cachedJSON, err := u.redis.Get(ctx, cacheKey); err == nil {
+		var cachedData []entity.GameInList
+		if errUnm := json.Unmarshal([]byte(cachedJSON), &cachedData); errUnm == nil {
+			logger.Info("GetListGames: cache hit", zap.String("key", cacheKey))
+			return cachedData, nil
+		}
+		logger.Error("cant unmarshall data from redis")
+	} else {
+		if !errors.Is(err, entity.ErrCacheMiss) {
+			logger.Warn("GetListGames: unexpected redis GET error", zap.String("key", cacheKey), zap.Error(err))
+		}
+		u.logger.Info("cache miss", zap.String("key", cacheKey))
+	}
 
 	// RPC
 	ratings, err := u.ratingClient.GetTopGames(ctx, limit, offset)
@@ -53,6 +72,17 @@ func (u *Usecase) GetListGames(ctx context.Context, limit, offset int32) ([]enti
 		}
 		meta.Rating = r.AverageRating
 		out = append(out, meta)
+	}
+
+	// Push data to cache
+	if b, err := json.Marshal(out); err == nil {
+		if errSet := u.redis.Set(ctx, cacheKey, string(b)); errSet != nil {
+			logger.Error("failed to set cache", zap.Error(errSet), zap.String("key", cacheKey))
+		} else {
+			logger.Info("cache set", zap.String("key", cacheKey))
+		}
+	} else {
+		logger.Error("Cant marshall data")
 	}
 
 	logger.Info("completed", zap.Int("returned", len(out)))

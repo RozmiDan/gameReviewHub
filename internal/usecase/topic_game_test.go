@@ -103,7 +103,7 @@ func TestUsecase_GetTopicGame(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			repo := &fakeTopicRepo{game: tc.repoGame, err: tc.repoErr}
 			rcl := &fakeratingClient{rating: tc.rating, err: tc.ratingErr}
-			uc := New(rcl, repo, zap.NewNop(), nil)
+			uc := New(rcl, repo, zap.NewNop(), nil, nopCache)
 
 			got, err := uc.GetTopicGame(context.Background(), gid)
 

@@ -16,6 +16,7 @@ type (
 		HttpInfo   httpStruct  `yaml:"http"`
 		GrpcInfo   grpcStruct  `yaml:"grpc"`
 		Kafka      KafkaConfig `yaml:"kafka"`
+		Redis      RedisConfig `yaml:"redis"`
 	}
 
 	appStruct struct {
@@ -49,6 +50,12 @@ type (
 		TopicRatings string        `yaml:"topic_ratings"`
 		DialTimeout  time.Duration `yaml:"dial_timeout"`
 		WriteTimeout time.Duration `yaml:"write_timeout"`
+	}
+	RedisConfig struct {
+		RedisAddress  string `yaml:"addr_redis" env-default:"6379"`
+		RedisPassword string `yaml:"pass_redis" env-default:""`
+		RedisDB       int    `yaml:"database_redis"`
+		RedisTTL      int    `yaml:"ttl_seconds_redis" env-required:"true"`
 	}
 )
 
